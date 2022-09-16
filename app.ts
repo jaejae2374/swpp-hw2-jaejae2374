@@ -29,6 +29,19 @@ let records: RecordType[] = [];
 //                 or the data sequence (e.g., rank order).
 function parseAndSave(text: string): void {
   // TODO: Fill this function. (3 points)
+  let sentences: string[][] = text.split("\n").slice(1).map(sentence => sentence.split(","));
+  if (sentences[sentences.length-1].length == 1) {
+    sentences.pop();
+  }
+  sentences.forEach(element => records.push(
+    {
+      year: parseInt(element[0]),
+      rank: parseInt(element[1]),
+      name: element[2],
+      gender: element[3],
+      rankChange: element[4] ? parseInt(element[4]) : null
+    }
+  ))
 }
 
 // `provideYearData(year)` is a function that receives a year and returns an array of data object corresponding to that year.
@@ -44,17 +57,34 @@ function parseAndSave(text: string): void {
 function provideYearData(year: number): RankType[] {
   // TODO: Fill in this function. (5 points)
 
+  // year filter -> male & female -> ascending
+  let datas: RecordType[] = records.filter(element => element.year == year)
+  
+  let results: RankType[] = []
+  let tmp: RankType;
+  for (let data of datas) {
+    let obj: RankType[] = results.filter(element => element.rank == data.rank);
+    tmp = obj.length? obj[0] : {
+      rank: data.rank,
+      male: null,
+      maleRankChange: null,
+      female: null,
+      femaleRankChange: null
+    }
+    if (data.gender == "M") {
+      tmp.male = data.name;
+      tmp.maleRankChange = data.rankChange;
+    } else {
+      tmp.female = data.name;
+      tmp.femaleRankChange = data.rankChange;
+    }
+    if (! obj.length) {
+      results.push(tmp);
+    }
+    }
   // This is just a reference for the return value's format. Delete this and fill your own
   // proper code to return the correct data.
-  return [
-    {
-      rank: 1,
-      male: "John",
-      maleRankChange: 0,
-      female: "Christina",
-      femaleRankChange: -2,
-    },
-  ];
+  return results.sort(function(a, b){return a.rank-b.rank});
 }
 
 // provideChartData(name, gender) is a function called when a user wants
