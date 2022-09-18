@@ -44,21 +44,71 @@ function provideYearData(year) {
     return results.sort(function (a, b) { return a.rank - b.rank; });
 }
 function provideChartData(name, gender) {
-    return [
-        { year: 2001, rank: 3 },
-        { year: 2002, rank: undefined },
-    ];
+    var resp = [];
+    var datas = records.filter(function (element) { return element.name == name && element.gender == gender; });
+    datas.forEach(function (element) { return resp.push({
+        year: element.year,
+        rank: element.rank
+    }); });
+    return resp;
 }
 function handleSignUpFormSubmit(form) {
-    var alertMessage = "TODO: Fill in this alert message properly";
+    var alertMessage;
+    var email = form['email'];
+    var first_name = form['first-name'];
+    var last_name = form['last-name'];
+    var birth = form['date-of-birth'];
+    var results = [];
+    var wrong_fields = [];
+    var email_valid = new RegExp(/^[0-9a-zA-Z]([^\s\@]*[0-9a-zA-Z])*@[0-9a-zA-Z]([^\s\@.]*[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i);
+    var name_valid = new RegExp(/^[A-Z][a-z]+$/);
+    var birth_valid = new RegExp(/^\d{4}-\d{2}-\d{2}/);
+    if (email_valid.test(email.value)) {
+        results.push({ name: "email", valid: true, message: null });
+    }
+    else {
+        results.push({ name: "email", valid: false, message: "Invalid email" });
+        wrong_fields.push("Email");
+    }
+    if (name_valid.test(first_name.value)) {
+        results.push({ name: "first-name", valid: true, message: null });
+    }
+    else {
+        results.push({ name: "first-name", valid: false, message: "Invalid first name" });
+        wrong_fields.push("First Name");
+    }
+    if (name_valid.test(last_name.value)) {
+        results.push({ name: "last-name", valid: true, message: null });
+    }
+    else {
+        results.push({ name: "last-name", valid: false, message: "Invalid last name" });
+        wrong_fields.push("Last Name");
+    }
+    if (birth_valid.test(birth.value)) {
+        var year = parseInt(birth.value.split("-")[0]);
+        var month = parseInt(birth.value.split("-")[1]);
+        var day = parseInt(birth.value.split("-")[2]);
+        if (year < 1900 || year > 2022 || month < 1 || month > 12 || day < 1 || day > 31) {
+            results.push({ name: "date-of-birth", valid: false, message: "Invalid date of birth" });
+            wrong_fields.push("Date of Birth");
+        }
+        else {
+            results.push({ name: "date-of-birth", valid: true, message: null });
+        }
+    }
+    else {
+        results.push({ name: "date-of-birth", valid: false, message: "Invalid date of birth" });
+        wrong_fields.push("Date of Birth");
+    }
+    if (wrong_fields.length) {
+        alertMessage = "You must correct: \n\n" + wrong_fields.join("\n");
+    }
+    else {
+        alertMessage = "Successfully Submitted!";
+    }
     return {
         alertMessage: alertMessage,
-        validationResults: [
-            { name: "first-name", valid: true, message: null },
-            { name: "last-name", valid: false, message: "Invalid last name" },
-            { name: "email", valid: true, message: null },
-            { name: "date-of-birth", valid: false, message: "Invalid date of birth" },
-        ]
+        validationResults: results
     };
 }
 //# sourceMappingURL=app.js.map

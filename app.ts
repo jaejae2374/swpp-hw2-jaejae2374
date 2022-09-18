@@ -41,7 +41,7 @@ function parseAndSave(text: string): void {
       gender: element[3],
       rankChange: element[4] ? parseInt(element[4]) : null
     }
-  ))
+  ));
 }
 
 // `provideYearData(year)` is a function that receives a year and returns an array of data object corresponding to that year.
@@ -57,10 +57,8 @@ function parseAndSave(text: string): void {
 function provideYearData(year: number): RankType[] {
   // TODO: Fill in this function. (5 points)
 
-  // year filter -> male & female -> ascending
-  let datas: RecordType[] = records.filter(element => element.year == year)
-  
-  let results: RankType[] = []
+  let datas: RecordType[] = records.filter(element => element.year == year);
+  let results: RankType[] = [];
   let tmp: RankType;
   for (let data of datas) {
     let obj: RankType[] = results.filter(element => element.rank == data.rank);
@@ -103,14 +101,18 @@ function provideYearData(year: number): RankType[] {
 //           ...,
 //           {year: 2018, rank: 380}]
 function provideChartData(name: string, gender: string): CharDataType[] {
-  // TODO: Fill in this function. (2 points)
-
+  // TODO: Fill in this function. (2 points)\
+  let resp: CharDataType[] = [];
+  let datas = records.filter(element => element.name==name && element.gender==gender);
+  datas.forEach(element => resp.push(
+    {
+      year: element.year,
+      rank: element.rank
+    }
+  ));
   // This is just a reference for the return value's format. Delete this and fill your own
   // proper code to return the correct data.
-  return [
-    { year: 2001, rank: 3 },
-    { year: 2002, rank: undefined },
-  ];
+  return resp;
 }
 
 // `handleSignUpFormSubmit(form)` is called when a user submits the sign up form.
@@ -120,9 +122,9 @@ function handleSignUpFormSubmit(form: FormType): {
   alertMessage: string;
   validationResults: ValidationResultType[];
 } {
-  let alertMessage = "TODO: Fill in this alert message properly";
+  let alertMessage: string;
   // TODO: Fill in the rest of function to get the HTML form element as above.
-
+  
   // Hint: you can use the `RegExp` class for matching a string.
 
   // The return data format is as follows. For the given `form` argument, you should
@@ -134,14 +136,79 @@ function handleSignUpFormSubmit(form: FormType): {
 
   // IMPORTANT NOTE: You must use the argument `form` rather than directly using APIs such as `document.getElementId` or `document.querySelector`.
   //                 Plus, please do not call `alert` function here.
-  //                 For debugging purpose, you can use `console.log`.
+  //                 For debugging purpose, you can use `console.log`. ValidationResultType
+  let email = form['email'];
+  let first_name = form['first-name'];
+  let last_name = form['last-name'];
+  let birth = form['date-of-birth'];
+  let results: ValidationResultType[] = [];
+  let wrong_fields: string[] = [];
+  const email_valid: RegExp = new RegExp(/^[0-9a-zA-Z]([^\s\@]*[0-9a-zA-Z])*@[0-9a-zA-Z]([^\s\@.]*[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i);
+  const name_valid: RegExp = new RegExp(/^[A-Z][a-z]+$/);
+  const birth_valid: RegExp = new RegExp(/^\d{4}-\d{2}-\d{2}/);
+
+  if (email_valid.test(email.value)) {
+    results.push(
+      { name: "email", valid: true, message: null }
+    );
+  } else {
+    results.push(
+      { name: "email", valid: false, message: "Invalid email" }
+    );
+    wrong_fields.push("Email");
+  }
+
+  if (name_valid.test(first_name.value)) {
+    results.push(
+      { name: "first-name", valid: true, message: null }
+    );
+  } else {
+    results.push(
+      { name: "first-name", valid: false, message: "Invalid first name" }
+    );
+    wrong_fields.push("First Name");
+  }
+
+  if (name_valid.test(last_name.value)) {
+    results.push(
+      { name: "last-name", valid: true, message: null }
+    );
+  } else {
+    results.push(
+      { name: "last-name", valid: false, message: "Invalid last name" }
+    );
+    wrong_fields.push("Last Name");
+  }
+
+  if (birth_valid.test(birth.value)) {
+    let year: number = parseInt(birth.value.split("-")[0]);
+    let month: number = parseInt(birth.value.split("-")[1]);
+    let day: number = parseInt(birth.value.split("-")[2]);
+    if (year < 1900 || year > 2022 || month < 1 || month > 12 || day < 1 || day > 31) {
+      results.push(
+        { name: "date-of-birth", valid: false, message: "Invalid date of birth" }
+      );
+      wrong_fields.push("Date of Birth");
+    } else {
+      results.push(
+        { name: "date-of-birth", valid: true, message: null }
+      );
+    }
+  } else {
+    results.push(
+      { name: "date-of-birth", valid: false, message: "Invalid date of birth" }
+    );
+    wrong_fields.push("Date of Birth");
+  }
+
+  if (wrong_fields.length) {
+    alertMessage = "You must correct: \n\n" + wrong_fields.join("\n");
+  } else {
+    alertMessage = "Successfully Submitted!";
+  }
+
   return {
     alertMessage: alertMessage,
-    validationResults: [
-      { name: "first-name", valid: true, message: null },
-      { name: "last-name", valid: false, message: "Invalid last name" },
-      { name: "email", valid: true, message: null },
-      { name: "date-of-birth", valid: false, message: "Invalid date of birth" },
-    ],
+    validationResults: results
   };
 }
