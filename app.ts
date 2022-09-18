@@ -110,9 +110,9 @@ function provideChartData(name: string, gender: string): CharDataType[] {
       rank: element.rank
     }
   ));
+  return resp.sort(function(a, b){return a.year-b.year});
   // This is just a reference for the return value's format. Delete this and fill your own
   // proper code to return the correct data.
-  return resp;
 }
 
 // `handleSignUpFormSubmit(form)` is called when a user submits the sign up form.
@@ -143,7 +143,7 @@ function handleSignUpFormSubmit(form: FormType): {
   let birth = form['date-of-birth'];
   let results: ValidationResultType[] = [];
   let wrong_fields: string[] = [];
-  const email_valid: RegExp = new RegExp(/^[0-9a-zA-Z]([^\s\@]*[0-9a-zA-Z])*@[0-9a-zA-Z]([^\s\@.]*[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i);
+  const email_valid: RegExp = new RegExp(/[^\s\@]+@[^\s\@.]+.[a-zA-Z]{2,3}$/i);
   const name_valid: RegExp = new RegExp(/^[A-Z][a-z]+$/);
   const birth_valid: RegExp = new RegExp(/^\d{4}-\d{2}-\d{2}/);
 
